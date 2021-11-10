@@ -1,0 +1,12 @@
+[submodule "dl_har_model"]
+	path = dl_har_model
+	url = git@github.com:STRCSussex-UbiCompSiegen/dl_har_model.git
+[submodule "dl_har_preprocessing"]
+	path = dl_har_preprocessing
+	url = git@github.com:STRCSussex-UbiCompSiegen/dl_har_preprocessing.git
+[submodule "dl_har_dataloader"]
+	path = dl_har_dataloader
+	url = git@github.com:STRCSussex-UbiCompSiegen/dl_har_dataloader.git
+[submodule "dl_for_har_evaluation"]
+	path = dl_for_har_evaluation
+	url = git@github.com:STRCSussex-UbiCompSiegen/dl_for_har_evaluation.git
