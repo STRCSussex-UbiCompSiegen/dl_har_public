@@ -21,9 +21,13 @@ def get_args():
     parser.add_argument(
         '-d', '--dataset', type=str, help='Target dataset. Required.', required=True)
     parser.add_argument(
+        '-v', '--valid_type', type=str, help='Validation type. Default split.', default='split', required=False)
+    parser.add_argument(
         '-m', '--model', type=str, help='Model architecture. Default deepconvlstm.', default='deepconvlstm')
     parser.add_argument(
         '-e', '--n_epochs', type=int, help='Number of epochs to train. Default 300.', default=300, required=False)
+    parser.add_argument(
+        '-s', '--smoothing', type=float, help='Label smoothing. Default 0.0.', default=0.0, required=False)
     parser.add_argument(
         '-lr', '--learning_rate', type=float, help='Initial learning rate. Default 1e-3.', default=1e-3, required=False)
     parser.add_argument(
@@ -49,20 +53,25 @@ wandb_logging = args.wandb
 
 # dataset settings
 target_dataset = args.dataset
-valid_type = 'loso'
+valid_type = args.valid_type
+train_sbjs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+valid_sbjs = [10, 11, 12, 13, 14]
 window_size = 24
 window_step = 12
 
 # training settings
 model = args.model
 batch_size_train = 256
-optimizer = 'Adam'
+optimizer = 'adam'
+loss = 'cross-entropy'
+smoothing = args.smoothing
 use_weights = True
 lr = args.learning_rate
 lr_schedule = args.learning_rate_schedule
 lr_step = args.learning_rate_schedule_step
 lr_decay = 0.9
 weights_init = 'orthogonal'
+weight_decay = 0.0
 epochs = args.n_epochs
 print_freq = 100
 
@@ -76,17 +85,22 @@ config = dict(
     dataset=target_dataset,
     model=model,
     valid_type=valid_type,
+    train_sbjs=train_sbjs,
+    valid_sbjs=valid_sbjs,
     window=window_size,
     stride=window_step,
     batch_size_train=batch_size_train,
     epochs=epochs,
     optimizer=optimizer,
+    loss=loss,
+    smoothing=smoothing,
     use_weights=use_weights,
     lr=lr,
     lr_schedule=lr_schedule,
     lr_step=lr_step,
     lr_decay=lr_decay,
     weights_init=weights_init,
+    weight_decay=weight_decay,
     print_freq=print_freq,
     batch_size_test=batch_size_test,
     num_batches_eval=num_batches_eval,
