@@ -3,9 +3,13 @@
 ##################################################
 # Author: Lloyd Pellatt
 # Email: lp349@sussex.ac.uk
+# Author: Marius Bock
+# Email: marius.bock@uni-siegen.de
 ##################################################
 
+import errno
 import os
+import sys
 
 import numpy as np
 import seaborn as sn
@@ -13,7 +17,17 @@ from matplotlib import pyplot as plt
 
 
 def makedir(path):
-    os.makedirs(path, exist_ok=True)
+    """
+    Creates a directory if not already exists.
+
+    :param str path: The path which is to be created.
+    :return: None
+    """
+    try:
+        os.makedirs(path)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
     if not os.path.exists:
         print(f"[+] Created directory in {path}")
 
@@ -64,9 +78,44 @@ class AverageMeter(object):
         return fmtstr.format(**self.__dict__)
 
 
+class Logger(object):
+    def __init__(self, fpath=None):
+        self.console = sys.stdout
+        self.file = None
+        if fpath is not None:
+            makedir(os.path.dirname(fpath))
+            self.file = open(fpath, 'w')
+
+    def __del__(self):
+        self.close()
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, *args):
+        self.close()
+
+    def write(self, msg):
+        self.console.write(msg)
+        if self.file is not None:
+            self.file.write(msg)
+
+    def flush(self):
+        self.console.flush()
+        if self.file is not None:
+            self.file.flush()
+            os.fsync(self.file.fileno())
+
+    def close(self):
+        self.console.close()
+        if self.file is not None:
+            self.file.close()
+
+
 def plot_pie(target, prefix, path_save, class_map=None, verbose=False):
     """
     Generate a pie chart of activity class distributions
+
     :param target: a list of activity labels corresponding to activity data segments
     :param prefix: data split, can be train, val or test
     :param path_save: path for saving the activity distribution pie chart
@@ -117,11 +166,10 @@ def plot_pie(target, prefix, path_save, class_map=None, verbose=False):
     plt.close()
 
 
-def plot_segment(
-    data, target, index, prefix, path_save, num_class, target_pred=None, class_map=None
-):
+def plot_segment(data, target, index, prefix, path_save, num_class, target_pred=None, class_map=None):
     """
     Plot a data segment with corresonding activity label
+
     :param data: data segment
     :param target: ground-truth activity label corresponding to data segment
     :param index: index of segment in dataset
