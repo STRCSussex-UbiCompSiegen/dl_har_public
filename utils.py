@@ -13,6 +13,7 @@ import sys
 
 import numpy as np
 import seaborn as sn
+import wandb
 from matplotlib import pyplot as plt
 
 
@@ -209,3 +210,48 @@ def plot_segment(data, target, index, prefix, path_save, num_class, target_pred=
     )
     fig.savefig(save_name, bbox_inches="tight")
     plt.close()
+
+
+def wandb_logging(train_results, test_results, project, entity, config):
+    wandb.init(project=project, entity=entity, config=config)
+
+    t_loss, t_acc, t_fw, t_fm = \
+        np.zeros(config['epochs']), np.zeros(config['epochs']), np.zeros(config['epochs']), np.zeros(config['epochs'])
+    v_loss, v_acc, v_fw, v_fm = \
+        np.zeros(config['epochs']), np.zeros(config['epochs']), np.zeros(config['epochs']), np.zeros(config['epochs'])
+
+    for i in range(len(train_results)):
+        t_loss = np.add(t_loss, train_results['t_loss'][i])
+        t_acc = np.add(t_acc, train_results['t_acc'][i])
+        t_fw = np.add(t_fw, train_results['t_fw'][i])
+        t_fm = np.add(t_fm, train_results['t_fm'][i])
+
+        v_loss = np.add(v_loss, train_results['v_loss'][i])
+        v_acc = np.add(v_acc, train_results['v_acc'][i])
+        v_fw = np.add(v_fw, train_results['v_fw'][i])
+        v_fm = np.add(v_fm, train_results['v_fm'][i])
+
+    table = wandb.Table(data=[[a, b, c, d, e, f, g, h, i] for (a, b, c, d, e, f, g, h, i) in
+                              zip(list(range(config['epochs'])), t_loss / len(train_results), t_acc / len(train_results),
+                                  t_fw / len(train_results), t_fm / len(train_results), v_loss / len(train_results),
+                                  v_acc / len(train_results), t_fw / len(train_results), t_fm / len(train_results))],
+                        columns=["epochs", "t_loss", "t_acc", "t_fw", "t_fm", "v_loss", "v_acc", "f_fw", "f_fm"]
+                        )
+
+    wandb.log({"train_loss": wandb.plot.line(table, "epochs", "t_loss", title='Train Loss'),
+               "train_acc": wandb.plot.line(table, "epochs", "t_acc", title='Train Accuracy'),
+               "train_fm": wandb.plot.line(table, "epochs", "t_fm", title='Train F1-macro'),
+               "train_fw": wandb.plot.line(table, "epochs", "t_fw", title='Train F1-weighted'),
+               "val_loss": wandb.plot.line(table, "epochs", "v_loss", title='Valid Loss'),
+               "val_acc": wandb.plot.line(table, "epochs", "v_acc", title='Valid Accuracy'),
+               "val_fm": wandb.plot.line(table, "epochs", "v_fm", title='Valid F1-macro'),
+               "val_fw": wandb.plot.line(table, "epochs", "v_fw", title='Valid F1-weigthed')})
+
+    if test_results is not None:
+        wandb.log({"test_loss": test_results['test_loss'].mean(),
+                   "test_acc": test_results['test_acc'].mean(),
+                   "test_fm": test_results['test_fm'].mean(),
+                   "test_fw": test_results['test_fw'].mean()
+                   })
+
+
