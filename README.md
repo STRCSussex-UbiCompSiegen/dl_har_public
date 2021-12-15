@@ -1,28 +1,47 @@
-# A Public Repository to Improve Replicability, Comparability and Collaboration in Deep Learning for Human Activity Recognition (PerCom 2022 WiP Submission)
+# A Public Repository to Improve Replicability, Comparability and Collaboration in Deep Learning for HAR (PerCom 2022 WiP Submission)
 
-This is the official GitHub page of the workshop paper publication "Increasing Replicability, Comparability and Collaboration in HAR Through a Common Code Base" presented at the IEEE International Confernce on Pervasive Computing and Communications (PerCom) Work in Progress (WiP) Session. [[cite our work]](#cite)
+This is the official GitHub page of the workshop paper publication _"Increasing Replicability, Comparability and Collaboration in HAR Through a Common Code Base"_ presented at the IEEE International Confernce on Pervasive Computing and Communications (PerCom) Work in Progress (WiP) Session. [[cite our work]](#cite)
+
+**Important:** Please do not forget to cite the papers corresponding to the datasets and architectures featured in this repository if you used to obtain results.
 
 ## Abstract
+Deep learning methods have become an almost default choice of machine learning approach for human activity recognition (HAR) systems that operate on time series data, such as those of wearable sensors. However, the implementations of such methods suffer from complex package dependencies, obsolescence, and subtleties in the implementation which are sometimes not well documented. 
+
+In order to accelerate research and minimise any discrepancies between (re-)implementations, we introduce a curated, open-source repository which (1) contains complete data loading and preprocessing pipelines for 6 well-established HAR datasets, (2) supports several popular HAR deep learning architectures, and (3) provides necessary functionalities to train and evaluate said models. 
+
+We welcome contributions from the fellow researcher to this repository, made available through: https://github.com/STRCSussex-UbiCompSiegen/dl_har_public
+
+## Contributing to this repository
+
+If you want to contribute to this repository **make sure to fork and clone this repository with all its submodules**. To do so please run:
+
+```
+git clone --recurse-submodules -j8 git@github.com:STRCSussex-UbiCompSiegen/dl_har_public.git
+```
+If you want to have your modification be merged into the repository, please issue a **pull request**. If you don't know how to do so, please check out [this guide](https://jarv.is/notes/how-to-pull-request-fork-github/).
 
 ## Repository structure
 
-The repository is structured into one main ```public``` repository (this one) and three submodules (```dataloader```, ```model``` and ```analysis```). More information on each submodule can be found in the ```ReadMe``` of each submodule.
+The repository is structured into one main [public](https://github.com/STRCSussex-UbiCompSiegen/dl_har_public) repository (this one) and three submodules:
+- [dataloader](https://github.com/STRCSussex-UbiCompSiegen/dl_har_dataloader/tree/86abd517579a5e4ac87535f4b4b2377e1394188f)
+- [model](https://github.com/STRCSussex-UbiCompSiegen/dl_har_model/tree/5e8341ab3c9d0a21a41ec276fd7bc30efed27ff8)
+- [analysis](https://github.com/STRCSussex-UbiCompSiegen/dl_for_har_analysis)
+
+More information on each submodule can be found in the ```ReadMe``` of the respective submodule.
 
 ### Work in Progress
 All files associated with the experiments mentioned in the _Work in Progress_ section of the publication can be found in the ```work_in_progress``` directory. This directory contains the job scripts, console log files, train and test results as well as an excel sheet containing the plots shown in the paper.
 
-## Rerunning experiments
+## (Re)-running experiments
+To demonstrate how to commence experiments, we created a sample main script called ```main.py``` within this directory. It shows how to use the main functionalities this repository provides. The script requires to be passed only the ```-d``` (dataset) argument. Currently we support the dataset options: ```opportunity``` [[4]](#4), ```rwhar``` [[6]](#6), ```skoda``` [[8]](#8), ```pamap2``` [[9]](#9), ```hhar``` [[5]](#5) and ```shl``` [[7]](#7).
+
+Using the ```-v``` argument one can define to either run ```loso``` (Leave-One-Subject-Out) or ```split``` (Train-Valid-Test) (cross-)validation. Note that you need to have previously run the corresponding preprocessing for the dataset. More on this can be read up within the ```dataloader``` submodule.
 
 ### Setup
 
 ### Preprocessing
 
-In order to run any experiments the datasets need to be downloaded locally on your working machine. To do so, run the ```preprocessing.py``` python script within the ```dataloader``` submodule, specifiying the dataset you want to download by passing the according YAML file via the ```-d``` argument. More on this can be read up within the ```dataloader``` submodule. 
-
-### Training & Predicition
-To commence experiments, run the ```main.py``` file within this directory. The script requires to be passed only the ```-d``` (dataset) argument. Currently we support the dataset options: ```opportunity``` [[4]](#4), ```rwhar``` [[6]](#6), ```skoda``` [[8]](#8), ```pamap2``` [[9]](#9), ```hhar``` [[5]](#5) and ```shl``` [[7]](#7).
-
-Using the ```-v``` argument one can define to either run ```loso``` (Leave-One-Subject-Out) or ```split``` (Train-Valid-Test) (cross-)validation. Note that you need to have previously run the corresponding preprocessing for the dataset. More on this can be read up within the ```dataloader``` submodule. 
+In order to run any experiments the datasets need to be downloaded locally on your working machine. To do so, run the ```preprocessing.py``` python script within the ```dataloader``` submodule, specifiying the dataset you want to download by passing the according YAML file via the ```-d``` argument. More on this can be read up within the ```dataloader``` submodule.
 
 ### Analysis
 The ```main.py``` script automatically performs an analysis on the obtained training, validation and (if applicable) testing results. If wished to rerun this analysis, one needs to run the ```analysis.py``` script passing it the ```-d``` (directory) of the log directory of the corresponding experiment. Note that this requires that you saved the predictions results using the ```--save_results``` flag of the ```main.py``` script.
