@@ -13,14 +13,25 @@ import sys
 import time
 
 from dl_for_har_analysis.analysis import run_train_analysis, run_test_analysis
-from dl_har_model.models.DeepConvLSTM import DeepConvLSTM
 
 from dl_har_model.train import split_validate, loso_cross_validate
 from utils import Logger, wandb_logging
+from importlib import import_module
 
 SEEDS = [1, 2]
 WANDB_PROJECT = 'grokking_for_har'
 WANDB_ENTITY = 'siegen-sussex-dl-for-har'
+
+N_CLASSES = {'opportunity': 18,
+             'pamap2': 12,
+             'skoda': 11,
+             'hhar': 0,
+             'rwhar': 0}
+N_CHANNELS = {'opportunity': 113,
+             'pamap2': 52,
+             'skoda': 60,
+             'hhar': 0,
+             'rwhar': 0}
 
 
 def get_args():
@@ -31,7 +42,8 @@ def get_args():
     parser.add_argument(
         '-v', '--valid_type', type=str, help='Validation type. Default split.', default='split', required=False)
     parser.add_argument(
-        '-m', '--model', type=str, help='Model architecture. Default deepconvlstm.', default='deepconvlstm')
+        '-m', '--model', type=str, help='Model architecture. Must be the exact name of a model in the models directory.'
+                                        'Default DeepConvLSTM.', default='DeepConvLSTM')
     parser.add_argument(
         '-e', '--n_epochs', type=int, help='Number of epochs to train. Default 300.', default=300, required=False)
     parser.add_argument(
@@ -98,6 +110,9 @@ def get_args():
 
 args = get_args()
 
+module = import_module(f'dl_har_model.models.{args.model}')
+Model = getattr(module, args.model)
+
 config_dataset = {
     "dataset": args.dataset,
     "window": args.window_size,
@@ -151,8 +166,10 @@ log_timestamp = time.strftime('%H%M%S')
 if args.logging:
     sys.stdout = Logger(os.path.join('logs', log_date, log_timestamp, 'log'))
 
-# TODO: model declaration with importlib
-model = DeepConvLSTM(113, 18, 'opportunity').cuda()
+model = Model(N_CHANNELS[args.dataset], N_CLASSES[args.dataset], args.dataset).cuda()
+
+model.path_checkpoints = os.path.join('logs')
+print(model)
 
 if args.valid_type == 'split':
     train_results, test_results, preds = split_validate(model, train_args, config_dataset, SEEDS, verbose=True)
