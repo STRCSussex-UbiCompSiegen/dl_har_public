@@ -1,6 +1,6 @@
 # A Public Repository to Improve Replicability, Comparability and Collaboration in Deep Learning for HAR (PerCom 2022 WiP Submission)
 
-This is the official GitHub page of the workshop paper publication _"Increasing Replicability, Comparability and Collaboration in HAR Through a Common Code Base"_ presented at the IEEE International Confernce on Pervasive Computing and Communications (PerCom) Work in Progress (WiP) Session. [[cite our work]](#cite)
+This is the official GitHub page of the workshop paper publication _"Increasing Replicability, Comparability and Collaboration in HAR Through a Common Code Base"_ presented at the 2022 IEEE International Conference on Pervasive Computing and Communications (PerCom 22') Work in Progress (WiP) Session. [[cite our work]](#cite)
 
 **Important:** Please do not forget to cite the papers corresponding to the datasets and architectures featured in this repository if you used to obtain results.
 
