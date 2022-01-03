@@ -30,7 +30,29 @@ The repository is structured into one main [public](https://github.com/STRCSusse
 More information on each submodule can be found in the ```ReadMe``` of the respective submodule.
 
 ### Work in Progress
-All files associated with the experiments mentioned in the _Work in Progress_ section of the publication can be found in the ```work_in_progress``` directory. This directory contains the job scripts, console log files, train and test results as well as an excel sheet containing the plots shown in the paper.
+All results and plots associated with the experiments mentioned in the _Work in Progress_ section of the publication can be found in the `work_in_progress` excel sheet. 
+
+To rerun the experiments run:
+
+- Setting 1: LRS + weighted
+
+```python main.py -d opportunity -v split --logging```
+
+- Setting 2: LRS
+
+```python main.py -d opportunity -v split --unweighted --logging```
+
+- Setting 3: weighted
+
+```python main.py -d opportunity -v split -lss 0 --logging```
+
+- Setting 4: none
+
+```python main.py -d opportunity -v split -lss 0 --unweighted --logging```
+
+<p align="center">
+    <img width="" height="" src="images/results.png">
+</p>
 
 ## (Re)-running experiments
 To demonstrate how to commence experiments, we created a sample main script called ```main.py``` within this directory. It shows how to use the main functionalities this repository provides. The script requires to be passed only the ```-d``` (dataset) argument. Currently we support the dataset options: ```opportunity``` [[4]](#4), ```rwhar``` [[6]](#6), ```skoda``` [[8]](#8), ```pamap2``` [[9]](#9), ```hhar``` [[5]](#5) and ```shl``` [[7]](#7).
@@ -38,6 +60,12 @@ To demonstrate how to commence experiments, we created a sample main script call
 Using the ```-v``` argument one can define to either run ```loso``` (Leave-One-Subject-Out) or ```split``` (Train-Valid-Test) (cross-)validation. Note that you need to have previously run the corresponding preprocessing for the dataset. More on this can be read up within the ```dataloader``` submodule.
 
 ### Setup
+
+Install the required packages using: 
+
+```pip install -r requirements.txt```
+
+Experiments mentioned in the paper were obtained using Python version `3.10`.
 
 ### Preprocessing
 
