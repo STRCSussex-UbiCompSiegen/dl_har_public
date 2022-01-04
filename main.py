@@ -50,7 +50,7 @@ def get_args():
         '-m', '--model', type=str, help='Model architecture. Must be the exact name of a model in the models directory.'
                                         'Default DeepConvLSTM.', default='DeepConvLSTM')
     parser.add_argument(
-        '-e', '--n_epochs', type=int, help='Number of epochs to train. Default 300.', default=2, required=False)
+        '-e', '--n_epochs', type=int, help='Number of epochs to train. Default 300.', default=300, required=False)
     parser.add_argument(
         '-o', '--optimizer', type=str, help='Optimizer. Default adam.', default='adam',
         required=False)
