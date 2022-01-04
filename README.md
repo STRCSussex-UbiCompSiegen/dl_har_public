@@ -30,7 +30,7 @@ The repository is structured into one main [public](https://github.com/STRCSusse
 More information on each submodule can be found in the ```ReadMe``` of the respective submodule.
 
 ### Work in Progress
-All results and plots associated with the experiments mentioned in the _Work in Progress_ section of the publication can be found in the `work_in_progress` excel sheet. 
+All logs files, results and plots associated with the experiments mentioned in the _Work in Progress_ section of the publication can be found in the `work_in_progress` excel sheet. 
 
 To rerun the experiments run:
 
@@ -51,7 +51,7 @@ To rerun the experiments run:
 ```python main.py -d opportunity -v split -lss 0 --unweighted --logging```
 
 <p align="center">
-    <img width="" height="" src="images/results.png">
+    <img width="" height="" src="work_in_progress/results.png">
 </p>
 
 ## (Re)-running experiments
