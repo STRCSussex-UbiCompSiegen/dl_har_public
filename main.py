@@ -134,7 +134,7 @@ train_args = {
     "lr": args.learning_rate,
     "lr_schedule": args.learning_rate_schedule,
     "lr_step": args.learning_rate_schedule_step,
-    "lr_decay": args.weight_decay,
+    "lr_decay": args.learning_rate_schedule_decay,
     "weights_init": args.weights_init,
     "epochs": args.n_epochs,
     "print_freq": args.print_freq,
