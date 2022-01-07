@@ -32,11 +32,6 @@ N_CHANNELS = {'opportunity': 113,
               'skoda': 60,
               'hhar': 0,
               'rwhar': 0}
-N_SUBJECTS = {'opportunity': 4,
-              'pamap2': 9,
-              'skoda': 1,
-              'hhar': 9,
-              'rwhar': 15}
 
 
 def get_args():
@@ -118,6 +113,10 @@ args = get_args()
 module = import_module(f'dl_har_model.models.{args.model}')
 Model = getattr(module, args.model)
 
+# parameters used to calculate runtime
+log_date = time.strftime('%Y%m%d')
+log_timestamp = time.strftime('%H%M%S')
+
 config_dataset = {
     "dataset": args.dataset,
     "window": args.window_size,
@@ -163,17 +162,11 @@ config = dict(
     wandb_logging=args.wandb
 )
 
-# parameters used to calculate runtime
-log_date = time.strftime('%Y%m%d')
-log_timestamp = time.strftime('%H%M%S')
+model = Model(N_CHANNELS[args.dataset], N_CLASSES[args.dataset], args.dataset, f"/{log_date}/{log_timestamp}").cuda()
 
 # saves logs to a file (standard output redirected)
 if args.logging:
-    sys.stdout = Logger(os.path.join('logs', log_date, log_timestamp, 'log'))
-
-model = Model(N_CHANNELS[args.dataset], N_CLASSES[args.dataset], args.dataset).cuda()
-
-model.path_checkpoints = os.path.join('logs', log_date, log_timestamp, 'models')
+    sys.stdout = Logger(os.path.join(model.path_logs, 'log'))
 print(model)
 
 if args.valid_type == 'split':
@@ -181,7 +174,7 @@ if args.valid_type == 'split':
         split_validate(model, train_args, config_dataset, seeds=SEEDS, verbose=True)
 elif args.valid_type == 'loso':
     train_results, test_results, preds = \
-        loso_cross_validate(model, N_SUBJECTS[args.dataset], train_args, config_dataset, seeds=SEEDS, verbose=True)
+        loso_cross_validate(model, train_args, config_dataset, seeds=SEEDS, verbose=True)
 
 run_train_analysis(train_results)
 run_test_analysis(test_results)
