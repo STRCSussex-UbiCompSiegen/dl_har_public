@@ -8,14 +8,17 @@
 ##################################################
 
 import argparse
+import json
 import os
 import sys
 import time
 
+import wandb
+
 from dl_for_har_analysis.analysis import run_train_analysis, run_test_analysis
 
 from dl_har_model.train import split_validate, loso_cross_validate
-from utils import Logger, wandb_logging
+from utils import Logger, wandb_logging, paint
 from importlib import import_module
 
 SEEDS = [1, 2, 3, 4, 5]
@@ -102,6 +105,9 @@ def get_args():
     parser.add_argument(
         '--unweighted', action='store_false', help='Flag indicating to use unweighted loss.',
         default=True, required=False)
+    parser.add_argument(
+        '--save_checkpoints', action='store_true', help='Flag indicating to use save model checkpoints.',
+        default=False, required=False)
 
     args = parser.parse_args()
 
@@ -109,13 +115,12 @@ def get_args():
 
 
 args = get_args()
+print(paint(f"Applied Settings: "))
+print(json.dumps(vars(args), indent=2, default=str))
 
 module = import_module(f'dl_har_model.models.{args.model}')
+print(paint(f"Applied Model: "))
 Model = getattr(module, args.model)
-
-# parameters used to calculate runtime
-log_date = time.strftime('%Y%m%d')
-log_timestamp = time.strftime('%H%M%S')
 
 config_dataset = {
     "dataset": args.dataset,
@@ -139,7 +144,8 @@ train_args = {
     "print_freq": args.print_freq,
     "loss": args.loss,
     "smoothing": args.smoothing,
-    "weight_decay": args.weight_decay
+    "weight_decay": args.weight_decay,
+    "save_checkpoints": args.save_checkpoints
 }
 
 config = dict(
@@ -162,6 +168,13 @@ config = dict(
     wandb_logging=args.wandb
 )
 
+# parameters used to calculate runtime
+log_date = time.strftime('%Y%m%d')
+log_timestamp = time.strftime('%H%M%S')
+
+if args.wandb:
+    wandb.init(project=WANDB_PROJECT, entity=WANDB_ENTITY, config={**config_dataset, **train_args})
+
 model = Model(N_CHANNELS[args.dataset], N_CLASSES[args.dataset], args.dataset, f"/{log_date}/{log_timestamp}").cuda()
 
 # saves logs to a file (standard output redirected)
@@ -180,10 +193,10 @@ run_train_analysis(train_results)
 run_test_analysis(test_results)
 
 if args.wandb:
-    wandb_logging(train_results, test_results, WANDB_PROJECT, WANDB_ENTITY, {**config_dataset, **train_args})
+    wandb_logging(train_results, test_results, {**config_dataset, **train_args})
 
 if args.save_results:
-    train_results.to_csv(os.path.join('logs', log_date, log_timestamp, 'train_results.csv'), index=False)
+    train_results.to_csv(os.path.join(model.path_logs, 'train_results.csv'), index=False)
     if test_results is not None:
-        test_results.to_csv(os.path.join('logs', log_date, log_timestamp, 'test_results.csv'), index=False)
-    preds.to_csv(os.path.join('logs', log_date, log_timestamp, 'preds.csv'), index=False)
+        test_results.to_csv(os.path.join(model.path_logs, 'test_results.csv'), index=False)
+    preds.to_csv(os.path.join(model.path_logs, 'preds.csv'), index=False)

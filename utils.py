@@ -212,9 +212,7 @@ def plot_segment(data, target, index, prefix, path_save, num_class, target_pred=
     plt.close()
 
 
-def wandb_logging(train_results, test_results, project, entity, config):
-    wandb.init(project=project, entity=entity, config=config)
-
+def wandb_logging(train_results, test_results, config):
     t_loss, t_acc, t_fw, t_fm = \
         np.zeros(config['epochs']), np.zeros(config['epochs']), np.zeros(config['epochs']), np.zeros(config['epochs'])
     v_loss, v_acc, v_fw, v_fm = \
