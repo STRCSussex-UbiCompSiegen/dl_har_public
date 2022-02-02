@@ -28,13 +28,13 @@ WANDB_ENTITY = 'siegen-sussex-dl-for-har'
 N_CLASSES = {'opportunity': 18,
              'pamap2': 12,
              'skoda': 11,
-             'hhar': 0,
-             'rwhar': 0}
+             'hhar': 7,
+             'rwhar': 8}
 N_CHANNELS = {'opportunity': 113,
               'pamap2': 52,
               'skoda': 60,
-              'hhar': 0,
-              'rwhar': 0}
+              'hhar': 3,
+              'rwhar': 3}
 
 
 def get_args():
