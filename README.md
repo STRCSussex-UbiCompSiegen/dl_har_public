@@ -55,7 +55,7 @@ To rerun the experiments run:
 </p>
 
 ## (Re)-running experiments
-To demonstrate how to commence experiments, we created a sample main script called ```main.py``` within this directory. It shows how to use the main functionalities this repository provides. The script requires to be passed only the ```-d``` (dataset) argument. Currently we support the dataset options: ```opportunity``` [[4]](#4), ```rwhar``` [[6]](#6), ```skoda``` [[8]](#8), ```pamap2``` [[9]](#9), ```hhar``` [[5]](#5) and ```shl``` [[7]](#7).
+To demonstrate how to commence experiments, we created a sample main script called ```main.py``` within this directory. It shows how to use the main functionalities this repository provides. The script requires to be passed only the ```-d``` (dataset) argument. Currently we support the dataset options: ```opportunity``` [[4]](#4), ```rwhar``` [[6]](#6), ```skoda``` [[8]](#8), ```pamap2``` [[9]](#9), ```hhar``` [[5]](#5) and ```shlpreview``` [[7]](#7).
 
 Using the ```-v``` argument one can define to either run ```loso``` (Leave-One-Subject-Out) or ```split``` (Train-Valid-Test) (cross-)validation. Note that you need to have previously run the corresponding preprocessing for the dataset. More on this can be read up within the ```dataloader``` submodule.
 
