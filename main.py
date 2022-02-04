@@ -29,12 +29,16 @@ N_CLASSES = {'opportunity': 18,
              'pamap2': 12,
              'skoda': 11,
              'hhar': 7,
-             'rwhar': 8}
+             'rwhar': 8,
+             'shlpreview': 9
+             }
 N_CHANNELS = {'opportunity': 113,
               'pamap2': 52,
               'skoda': 60,
               'hhar': 3,
-              'rwhar': 3}
+              'rwhar': 3,
+              'shlpreview': 22
+              }
 
 
 def get_args():
