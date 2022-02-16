@@ -22,7 +22,7 @@ from utils import Logger, wandb_logging, paint
 from importlib import import_module
 
 SEEDS = [1, 2, 3, 4, 5]
-WANDB_PROJECT = 'grokking_for_har'
+WANDB_PROJECT = 'work-in-progress'
 WANDB_ENTITY = 'siegen-sussex-dl-for-har'
 
 N_CLASSES = {'opportunity': 18,
