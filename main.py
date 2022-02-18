@@ -8,19 +8,37 @@
 ##################################################
 
 import argparse
+import json
 import os
 import sys
 import time
 
+import wandb
+
 from dl_for_har_analysis.analysis import run_train_analysis, run_test_analysis
-from dl_har_model.models.DeepConvLSTM import DeepConvLSTM
 
 from dl_har_model.train import split_validate, loso_cross_validate
-from utils import Logger, wandb_logging
+from utils import Logger, wandb_logging, paint
+from importlib import import_module
 
-SEEDS = [1, 2]
-WANDB_PROJECT = 'grokking_for_har'
+SEEDS = [1, 2, 3, 4, 5]
+WANDB_PROJECT = 'work-in-progress'
 WANDB_ENTITY = 'siegen-sussex-dl-for-har'
+
+N_CLASSES = {'opportunity': 18,
+             'pamap2': 12,
+             'skoda': 11,
+             'hhar': 7,
+             'rwhar': 8,
+             'shlpreview': 9
+             }
+N_CHANNELS = {'opportunity': 113,
+              'pamap2': 52,
+              'skoda': 60,
+              'hhar': 3,
+              'rwhar': 3,
+              'shlpreview': 22
+              }
 
 
 def get_args():
@@ -31,7 +49,8 @@ def get_args():
     parser.add_argument(
         '-v', '--valid_type', type=str, help='Validation type. Default split.', default='split', required=False)
     parser.add_argument(
-        '-m', '--model', type=str, help='Model architecture. Default deepconvlstm.', default='deepconvlstm')
+        '-m', '--model', type=str, help='Model architecture. Must be the exact name of a model in the models directory.'
+                                        'Default DeepConvLSTM.', default='DeepConvLSTM')
     parser.add_argument(
         '-e', '--n_epochs', type=int, help='Number of epochs to train. Default 300.', default=300, required=False)
     parser.add_argument(
@@ -90,6 +109,9 @@ def get_args():
     parser.add_argument(
         '--unweighted', action='store_false', help='Flag indicating to use unweighted loss.',
         default=True, required=False)
+    parser.add_argument(
+        '--save_checkpoints', action='store_true', help='Flag indicating to use save model checkpoints.',
+        default=False, required=False)
 
     args = parser.parse_args()
 
@@ -97,6 +119,12 @@ def get_args():
 
 
 args = get_args()
+print(paint(f"Applied Settings: "))
+print(json.dumps(vars(args), indent=2, default=str))
+
+module = import_module(f'dl_har_model.models.{args.model}')
+print(paint(f"Applied Model: "))
+Model = getattr(module, args.model)
 
 config_dataset = {
     "dataset": args.dataset,
@@ -114,13 +142,14 @@ train_args = {
     "lr": args.learning_rate,
     "lr_schedule": args.learning_rate_schedule,
     "lr_step": args.learning_rate_schedule_step,
-    "lr_decay": args.weight_decay,
+    "lr_decay": args.learning_rate_schedule_decay,
     "weights_init": args.weights_init,
     "epochs": args.n_epochs,
     "print_freq": args.print_freq,
     "loss": args.loss,
     "smoothing": args.smoothing,
-    "weight_decay": args.weight_decay
+    "weight_decay": args.weight_decay,
+    "save_checkpoints": args.save_checkpoints
 }
 
 config = dict(
@@ -147,26 +176,31 @@ config = dict(
 log_date = time.strftime('%Y%m%d')
 log_timestamp = time.strftime('%H%M%S')
 
+if args.wandb:
+    wandb.init(project=WANDB_PROJECT, entity=WANDB_ENTITY, config={**config_dataset, **train_args})
+
+model = Model(N_CHANNELS[args.dataset], N_CLASSES[args.dataset], args.dataset, f"/{log_date}/{log_timestamp}").cuda()
+
 # saves logs to a file (standard output redirected)
 if args.logging:
-    sys.stdout = Logger(os.path.join('logs', log_date, log_timestamp, 'log'))
-
-# TODO: model declaration with importlib
-model = DeepConvLSTM(113, 18, 'opportunity').cuda()
+    sys.stdout = Logger(os.path.join(model.path_logs, 'log'))
+print(model)
 
 if args.valid_type == 'split':
-    train_results, test_results, preds = split_validate(model, train_args, config_dataset, SEEDS, verbose=True)
+    train_results, test_results, preds = \
+        split_validate(model, train_args, config_dataset, seeds=SEEDS, verbose=True)
 elif args.valid_type == 'loso':
-    train_results, test_results, preds = loso_cross_validate(model, train_args, config_dataset, SEEDS, verbose=True)
+    train_results, test_results, preds = \
+        loso_cross_validate(model, train_args, config_dataset, seeds=SEEDS, verbose=True)
 
 run_train_analysis(train_results)
 run_test_analysis(test_results)
 
 if args.wandb:
-    wandb_logging(train_results, test_results, WANDB_PROJECT, WANDB_ENTITY, {**config_dataset, **train_args})
+    wandb_logging(train_results, test_results, {**config_dataset, **train_args})
 
 if args.save_results:
-    train_results.to_csv(os.path.join('logs', log_date, log_timestamp, 'train_results.csv'), index=False)
+    train_results.to_csv(os.path.join(model.path_logs, 'train_results.csv'), index=False)
     if test_results is not None:
-        test_results.to_csv(os.path.join('logs', log_date, log_timestamp, 'test_results.csv'), index=False)
-    preds.to_csv(os.path.join('logs', log_date, log_timestamp, 'preds.csv'), index=False)
+        test_results.to_csv(os.path.join(model.path_logs, 'test_results.csv'), index=False)
+    preds.to_csv(os.path.join(model.path_logs, 'preds.csv'), index=False)
