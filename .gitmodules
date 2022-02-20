@@ -7,6 +7,6 @@
 [submodule "dl_har_dataloader"]
 	path = dl_har_dataloader
 	url = git@github.com:STRCSussex-UbiCompSiegen/dl_har_dataloader.git
-[submodule "dl_for_har_analysis"]
-	path = dl_for_har_analysis
-	url = git@github.com:STRCSussex-UbiCompSiegen/dl_for_har_analysis.git
+[submodule "dl_har_analysis"]
+	path = dl_har_analysis
+	url = ./dl_har_analysis
