@@ -9,4 +9,4 @@
 	url = git@github.com:STRCSussex-UbiCompSiegen/dl_har_dataloader.git
 [submodule "dl_har_analysis"]
 	path = dl_har_analysis
-	url = ./dl_har_analysis
+	url = git@github.com:STRCSussex-UbiCompSiegen/dl_har_analysis.git
