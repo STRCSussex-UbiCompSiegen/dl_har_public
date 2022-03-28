@@ -15,7 +15,7 @@ import time
 
 import wandb
 
-from dl_har_analysis.analysis import run_train_analysis, run_test_analysis
+from dl_for_har_analysis.analysis import run_train_analysis, run_test_analysis
 
 from dl_har_model.train import split_validate, loso_cross_validate
 from utils import Logger, wandb_logging, paint
